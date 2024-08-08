@@ -17,7 +17,7 @@ model Task{
   task_id Int @id @default(autoincrement())
   title String
   status String
-  limit_date DateTime
+  deadline DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
