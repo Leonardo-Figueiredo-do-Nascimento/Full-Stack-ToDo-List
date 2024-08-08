@@ -31,4 +31,4 @@ const deleteTask = async (task_id)=>{
     console.log('Task Deleted:', task);
 }
 
-module.exports = {createTask}
+module.exports = {createTask,getAllTasks,updateTask,deleteTask}
