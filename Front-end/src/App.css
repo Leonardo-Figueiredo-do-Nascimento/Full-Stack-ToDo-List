@@ -1,0 +1,21 @@
+.main-div{
+  height: 100%;
+  width: 100%;
+}
+.container{
+  height: 85%;
+  width: 100%;
+  background: linear-gradient(to top, #25667c, #0f1b3a); 
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.container input[type="date"]{
+  height: 10%;
+  width: auto;
+  border-radius: 100px;
+  font-size: 4vh;
+  top: 5%;
+  position: absolute;
+}
