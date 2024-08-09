@@ -1,9 +1,10 @@
-const service = require('./services/taskService')
+const service = require('../services/taskService')
 
 exports.listTask = async (req, res) => {
     try {
-        const tasks = service.getAllTasks()
+        const tasks = await service.getAllTasks()
         res.json(tasks)
+        res.send(tasks)
     } catch (error) {
         res.status(500).json({ error: error.message })   
     }
@@ -21,9 +22,19 @@ exports.createTask = async (req,res) => {
 
 exports.updateTask = async (req,res) => {
     try {
-        const {task_id} = req.body
+        const {task_id} = req.params
         const updatedTask = await service.updateTask(task_id,req.body)
-        res.status(201).json(updatedTask);
+        res.status(200).json(updatedTask);
+    } catch (error) {
+        res.status(500).json({ error: error.message })   
+    }
+}
+
+exports.updateTaskStatus = async (req,res) => {
+    try {
+        const {task_id,status} = req.params
+        const updatedTask = await service.updateTaskStatus(task_id,status)
+        res.status(200).json(updatedTask);
     } catch (error) {
         res.status(500).json({ error: error.message })   
     }
@@ -31,9 +42,9 @@ exports.updateTask = async (req,res) => {
 
 exports.deleteTask = async (req,res) => {
     try {
-        const {task_id} = req.body
-        const deleteTask = await service.deleteTask(task_id)
-        res.status(200).json(deleteTask);
+        const {task_id} = req.params
+        await service.deleteTask(task_id)
+        res.status(204).send();
     } catch (error) {
         res.status(500).json({ error: error.message })   
     }
