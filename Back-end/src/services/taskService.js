@@ -19,11 +19,12 @@ const createTask = async (title,status,deadline)=>{
     console.log('Task Registered:', task);
 }
 const getAllTasks = async (date) => {
+    //Adjusted for brazilian timezone
     const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0);
+    startOfDay.setUTCHours(0, 0, 0, 0); // Definindo o início do dia em UTC
 
     const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59);
+    endOfDay.setUTCHours(23, 59, 59, 999); // Definindo o final do dia em UTC
 
     const tasks = await prisma.task.findMany({
         where: {
