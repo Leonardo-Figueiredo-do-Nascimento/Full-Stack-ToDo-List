@@ -2,9 +2,9 @@ const service = require('../services/taskService')
 
 exports.listTask = async (req, res) => {
     try {
-        const tasks = await service.getAllTasks()
+        const {deadline} = req.params
+        const tasks = await service.getAllTasks(deadline)
         res.json(tasks)
-        res.send(tasks)
     } catch (error) {
         res.status(500).json({ error: error.message })   
     }
