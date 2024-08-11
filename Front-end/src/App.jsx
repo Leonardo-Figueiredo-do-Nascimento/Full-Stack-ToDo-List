@@ -12,7 +12,9 @@ function App() {
   const [taskDate, setTaskDate] = useState('');
   const [taskTime, setTaskTime] = useState('');
   const [taskStatus, setTaskStatus] = useState('');
+  const [taskCreated, setTaskCreated] = useState(false);
   const [addTask,setAddTask] = useState(false)
+  const [addButton,setAddButton] = useState(false)
   const [task,setTask] = useState()
   const [tasks,setTasks] = useState([])
 
@@ -38,7 +40,7 @@ function App() {
       }
     }
     getData()
-  },[taskDate])
+  },[taskDate,task])
 
   const handleTimeChange = (e) => {
     const selectedTime = e.target.value;
@@ -58,9 +60,13 @@ function App() {
 
     if (selectedDate < currentDate) {
       setTaskDate(''); 
+      setAddTask(false)
+      setAddButton(false)
     } else {
       setTaskDate(selectedDate);
-      setTaskStatus("In Progress")
+      setTaskStatus("In Progress");
+      setAddTask(true)
+      setAddButton(true)
     }
   };
   const getCurrentDate = () => {
@@ -80,13 +86,19 @@ function App() {
           headers: {
               'Content-Type': 'application/json',
           }
-        })  
+        })
+        if (response.status === 200) { 
+            setTaskCreated(true)
+        } else {
+            console.log('Register error:', response.data);
+        }  
       } catch (error) {
         console.log(error)
       }
       setTaskTitle('');
-      setTaskDate(''); 
       setTaskTime(''); 
+      setTask()
+      setAddTask(false)
     }
   }
   const deleteTask = async (e) => {
@@ -103,7 +115,7 @@ function App() {
       <div className="container">
           <input type="date" onChange={handleDateChange}/>
           
-          {(taskDate!='' || addTask) ? (
+          {addTask ? (
             <form className="addTask-form" onSubmit={registerTask}>
               <h2>Fill the task fields</h2>
               <div className="task-fields-div">
@@ -117,16 +129,16 @@ function App() {
                 </div>
               </div>
               <input type="submit" value="ADD TASK" />
-              <input type="button" value="Cancel" onClick={()=>{setAddTask(false);setTaskDate("")}}/>
+              <input type="button" value="Cancel" onClick={()=>{setAddTask(false)}}/>
             </form>
           ):(<></>)}
-          {tasks.length>0 ? (<input id='new-task' type="button" value="ADD NEW TASK" onClick={()=>setAddTask(true)}/>): (<></>)}
+          {addButton ? (<input id='new-task' type="button" value="ADD NEW TASK" onClick={()=>setAddTask(true)}/>): (<></>)}
           {tasks.length>0 ? (
             <div className='tasks-container'>
               {
                 tasks.map((task,index)=> (
                 <div className='task-content'>
-                  <TaskCard key={index} title={task.title} status={task.status} deadline={task.deadline.slice(-5)}/>
+                  <TaskCard title={task.title} status={task.status} deadline={task.deadline.slice(-5)}/>
                   <button onClick={()=>setTaskStatus("Completed")}>Finish</button>
                   <button id='update-task-bt' onClick={deleteTask}><img src="../public/edit-icon.svg"/></button>
                   <button id='delete-task-bt' onClick={deleteTask}><img src="../public/trash-icon.png"/></button>
