@@ -1,0 +1,36 @@
+.task-div{
+    height: 100%;
+    width: 70%;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: rgb(201, 207, 212);
+}
+
+.task-div p{
+    height: auto;
+    width: 20%;
+    font-size: 3vh;
+}
+#status{
+    height: auto;
+    width: 20%;
+}
+#title{
+    height: auto;
+    width: 50%;
+    border-radius: 10px;
+    color: white;
+    padding-left: 1vh;
+    background-color: rgba(22, 22, 34, 0.938);
+}
+#deadline{
+    height: auto;
+    width: auto;
+    border-radius: 10px;
+    padding: 0.5vh;
+    color: white;
+    background-color: black;
+}
