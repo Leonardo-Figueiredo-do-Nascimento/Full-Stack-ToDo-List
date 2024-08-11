@@ -1,7 +1,10 @@
 import { useState,useEffect } from 'react'
 import Header from './components/Header/Header'
 import TaskCard from './components/Task Card/TaskCard';
+import axios from 'axios';
+import config from './serverURL';
 import './App.css'
+const serverURL = config.serverAdress
 
 function App() {
 
@@ -23,6 +26,19 @@ function App() {
       }
     })
   },[taskDate,taskTitle,taskTime,taskStatus])
+
+  //useEffect to get tasks
+  useEffect(()=>{
+    async function getData() {
+      try {
+          const response = await axios.get(`${serverURL}${taskDate}`)
+          setTasks(response.data)
+      } catch (error) {
+          console.log("Error: ", error)
+      }
+    }
+    getData()
+  },[taskDate])
 
   const handleTimeChange = (e) => {
     const selectedTime = e.target.value;
@@ -54,11 +70,20 @@ function App() {
     const day = String(currentDate.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+
   const registerTask = async (e) => {
     e.preventDefault()
     if(taskTitle!="" && taskTime!=""){
       console.log(task)
-      setTasks((prevTasks) => [...prevTasks, task]);
+      try {
+        const response = await axios.post(`${serverURL}`,task, {
+          headers: {
+              'Content-Type': 'application/json',
+          }
+        })  
+      } catch (error) {
+        console.log(error)
+      }
       setTaskTitle('');
       setTaskDate(''); 
       setTaskTime(''); 
