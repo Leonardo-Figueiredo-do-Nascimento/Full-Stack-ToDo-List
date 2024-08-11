@@ -12,7 +12,7 @@ function App() {
   const [taskDate, setTaskDate] = useState('');
   const [taskTime, setTaskTime] = useState('');
   const [taskStatus, setTaskStatus] = useState('');
-  const [taskCreated, setTaskCreated] = useState(false);
+  const [taskDeleted, setTaskDeleted] = useState(false);
   const [addTask,setAddTask] = useState(false)
   const [addButton,setAddButton] = useState(false)
   const [task,setTask] = useState()
@@ -40,7 +40,8 @@ function App() {
       }
     }
     getData()
-  },[taskDate,task])
+    setTaskDeleted(false)
+  },[taskDate,task,taskDeleted])
 
   const handleTimeChange = (e) => {
     const selectedTime = e.target.value;
@@ -88,7 +89,7 @@ function App() {
           }
         })
         if (response.status === 200) { 
-            setTaskCreated(true)
+            console.log("Task Created")
         } else {
             console.log('Register error:', response.data);
         }  
@@ -101,11 +102,20 @@ function App() {
       setAddTask(false)
     }
   }
-  const deleteTask = async (e) => {
-    e.preventDefault()
+  const deleteTask = async (taskId) => {
     const deleteConfirm = confirm("Are you sure you want to delete this task?")
     if(deleteConfirm){
-
+      try {
+        const response = await axios.delete(`${serverURL}${taskId}`)
+        if (response.status === 200) { 
+            console.log("Delete sucessfull")
+            
+        } else {
+            console.log('Register error:', response.data);
+        }  
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 
@@ -140,8 +150,8 @@ function App() {
                 <div className='task-content'>
                   <TaskCard title={task.title} status={task.status} deadline={task.deadline.slice(-5)}/>
                   <button onClick={()=>setTaskStatus("Completed")}>Finish</button>
-                  <button id='update-task-bt' onClick={deleteTask}><img src="../public/edit-icon.svg"/></button>
-                  <button id='delete-task-bt' onClick={deleteTask}><img src="../public/trash-icon.png"/></button>
+                  <button id='update-task-bt'><img src="../public/edit-icon.svg"/></button>
+                  <button id='delete-task-bt' onClick={()=>{deleteTask(task.task_id); setTaskDeleted(true)}}><img src="../public/trash-icon.png"/></button>
                 </div>  
                 ))
               }
