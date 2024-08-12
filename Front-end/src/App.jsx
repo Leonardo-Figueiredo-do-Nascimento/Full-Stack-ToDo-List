@@ -7,7 +7,6 @@ import './App.css'
 const serverURL = config.serverAdress
 
 function App() {
-
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDate, setTaskDate] = useState('');
   const [taskTime, setTaskTime] = useState('');
@@ -21,6 +20,17 @@ function App() {
   const [addButton,setAddButton] = useState(false)
   const [task,setTask] = useState()
   const [tasks,setTasks] = useState([])
+  const [currentTime,setCurrentTime]=useState('')
+
+  //useEffect to get current time
+  // useEffect(()=>{
+  //   const intervalId = setInterval(() => {
+  //     setCurrentTime(getCurrentDateTime());
+  //     console.log(currentTime)
+  //   }, 1000);
+    
+  //   return () => clearInterval(intervalId);
+  // },[currentTime])
 
   //useEffect to set new task
   useEffect(()=>{
@@ -32,7 +42,6 @@ function App() {
       }
     })
   },[taskDate,taskTitle,taskTime,taskStatus])
-
   //useEffect to get tasks
   useEffect(()=>{
     async function getData() {
@@ -45,7 +54,31 @@ function App() {
     }
     getData()
     setTaskDeleted(false)
-  },[taskDate,task,taskDeleted,updateTaskForm])
+    setCompleted(false)
+  },[taskDate,task,taskDeleted,updateTaskForm,completed])
+  
+  //useEffect to update tasks to unfinished if not completed
+  // useEffect(()=>{
+  //   tasks.map( async (task)=>{
+  //     if(task.deadline<currentTime && task.status!="Finished"){
+  //       try {
+  //         const response = await axios.put(`${serverURL}${task.task_id}/status/${"Unfinished"}`,{
+  //           headers: {
+  //               'Content-Type': 'application/json',
+  //           }
+  //         })
+  //         if (response.status === 200) { 
+  //           console.log("Task Update")
+  //           setUpdateTaskForm(false)
+  //         } else {
+  //           console.log('Update error:', response.data);
+  //         }
+  //       } catch (error) {
+  //         console.log(error)
+  //       }
+  //     }
+  //   })
+  // },[])
 
   const handleTimeChange = (e) => {
     const selectedTime = e.target.value;
@@ -81,7 +114,16 @@ function App() {
     const day = String(currentDate.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-
+  const getCurrentDateTime = () => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const hours = String(currentDate.getHours()).padStart(2, '0');
+    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
   const updateForm = ()=>{
     return (
       <div className='updateTask'>
@@ -103,7 +145,6 @@ function App() {
       </div>
     )
   }
-
   const registerTask = async (e) => {
     e.preventDefault()
     if(taskTitle!="" && taskTime!=""){
@@ -128,6 +169,24 @@ function App() {
       setAddTask(false)
     }
   }
+  const completeTask = async (e,task_id) =>{
+    e.preventDefault()
+    try {
+      const response = await axios.put(`${serverURL}${task_id}/status/${"Completed"}`,{
+        headers: {
+            'Content-Type': 'application/json',
+        }
+      })
+      if (response.status === 200) { 
+        console.log("Task Completed")
+        setCompleted(true)
+      } else {
+        console.log(response.data);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
   const updateTask = async (e,taskId) =>{
     e.preventDefault()
     setTaskStatus("In Progress");
@@ -147,6 +206,25 @@ function App() {
       console.log('Error:', error);
     }
   }
+  // const updateTaskStatus = async (e,taskId) =>{
+  //   e.preventDefault()
+  //   try {
+  //     const response = await axios.put(`${serverURL}${taskId}`,task, {
+  //       headers: {
+  //           'Content-Type': 'application/json',
+  //       }
+  //     })
+  //     if (response.status === 200) { 
+  //       console.log("Task Update")
+  //       setUpdateTaskForm(false)
+  //     } else {
+  //       console.log('Update error:', response.data);
+  //     }
+  //   } catch (error) {
+  //     console.log('Error:', error);
+  //   }
+  // }
+
   const deleteTask = async (taskId) => {
     const deleteConfirm = confirm("Are you sure you want to delete this task?")
     if(deleteConfirm){
@@ -194,9 +272,15 @@ function App() {
                 tasks.map((task,index)=> (
                 <div className='task-content'>
                   <TaskCard title={task.title} status={task.status} deadline={task.deadline.slice(11,16)}/>
-                  <button onClick={()=>setTaskStatus("Completed")}>Finish</button>
-                  <button id='update-task-bt' onClick={()=>{setUpdateTaskForm(true);setUpdateId(task.task_id);setTaskTitle(task.title);setTaskTime(task.deadline.slice(11,16))}}><img src="../public/edit-icon.svg"/></button>
-                  <button id='delete-task-bt' onClick={()=>{deleteTask(task.task_id); setTaskDeleted(true)}}><img src="../public/trash-icon.png"/></button>
+                  { task.status=="In Progress" ? (
+                    <>
+                      <button onClick={(e)=>completeTask(e,task.task_id)}>Finish</button>
+                      <button id='update-task-bt' onClick={()=>{setUpdateTaskForm(true);setUpdateId(task.task_id);setTaskTitle(task.title);setTaskTime(task.deadline.slice(11,16))}}><img src="../public/edit-icon.svg"/></button>
+                      <button id='delete-task-bt' onClick={()=>{deleteTask(task.task_id); setTaskDeleted(true)}}><img src="../public/trash-icon.png"/></button>
+                    </>
+                    ):(<></>)
+                  }
+                  
                 </div>  
                 ))
               }
