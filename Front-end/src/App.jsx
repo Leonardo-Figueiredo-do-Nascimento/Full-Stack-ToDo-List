@@ -21,7 +21,6 @@ function App() {
   const [addButton,setAddButton] = useState(false)
   const [task,setTask] = useState()
   const [tasks,setTasks] = useState([])
-  const [currentTime,setCurrentTime]=useState('')
 
   //useEffect to get current time and update tasks to unfinished if not completed
   useEffect(()=>{
@@ -83,29 +82,6 @@ function App() {
     setCompleted(false)
     setIncomplete(false)
   },[taskDate,task,taskDeleted,updateTaskForm,completed,incomplete])
-  
-  //useEffect to update tasks to unfinished if not completed
-  // useEffect(()=>{
-  //   tasks.map( async (task)=>{
-  //     if(task.deadline<currentTime && task.status!="Finished"){
-  //       try {
-  //         const response = await axios.put(`${serverURL}${task.task_id}/status/${"Unfinished"}`,{
-  //           headers: {
-  //               'Content-Type': 'application/json',
-  //           }
-  //         })
-  //         if (response.status === 200) { 
-  //           console.log("Task Update")
-  //           setUpdateTaskForm(false)
-  //         } else {
-  //           console.log('Update error:', response.data);
-  //         }
-  //       } catch (error) {
-  //         console.log(error)
-  //       }
-  //     }
-  //   })
-  // },[])
 
   const handleTimeChange = (e) => {
     const selectedTime = e.target.value;
@@ -141,16 +117,6 @@ function App() {
     const day = String(currentDate.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-  const getCurrentDateTime = () => {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.getDate()).padStart(2, '0');
-    const hours = String(currentDate.getHours()).padStart(2, '0');
-    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-};
   const updateForm = ()=>{
     return (
       <div className='updateTask'>
