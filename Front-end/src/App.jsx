@@ -13,6 +13,10 @@ function App() {
   const [taskTime, setTaskTime] = useState('');
   const [taskStatus, setTaskStatus] = useState('');
   const [taskDeleted, setTaskDeleted] = useState(false);
+  const [updateTaskForm, setUpdateTaskForm] = useState(false);
+  const [updateId, setUpdateId] = useState();
+  const [completed,setCompleted] = useState(false)
+  const [uncompleted,setUncompleted] = useState(false)
   const [addTask,setAddTask] = useState(false)
   const [addButton,setAddButton] = useState(false)
   const [task,setTask] = useState()
@@ -41,7 +45,7 @@ function App() {
     }
     getData()
     setTaskDeleted(false)
-  },[taskDate,task,taskDeleted])
+  },[taskDate,task,taskDeleted,updateTaskForm])
 
   const handleTimeChange = (e) => {
     const selectedTime = e.target.value;
@@ -78,6 +82,28 @@ function App() {
     return `${year}-${month}-${day}`;
   };
 
+  const updateForm = ()=>{
+    return (
+      <div className='updateTask'>
+        <form className="updateTask-form" onSubmit={(e) => updateTask(e, updateId)}>
+          <h2>Update the task fields</h2>
+          <div className="task-fields-div">
+            <div className='task-field'>
+              <label>Title:</label>
+              <input type="text" value={taskTitle} onChange={(e)=>setTaskTitle(e.target.value)}/>
+            </div>
+            <div className='task-field'>
+              <label>Time:</label>
+              <input type="time" value={taskTime} onChange={handleTimeChange} />
+            </div>
+          </div>
+          <input type="submit" value="UPDATE TASK" />
+          <input type="button" value="Cancel" onClick={()=>{setUpdateTaskForm(false)}}/>
+        </form>
+      </div>
+    )
+  }
+
   const registerTask = async (e) => {
     e.preventDefault()
     if(taskTitle!="" && taskTime!=""){
@@ -102,6 +128,25 @@ function App() {
       setAddTask(false)
     }
   }
+  const updateTask = async (e,taskId) =>{
+    e.preventDefault()
+    setTaskStatus("In Progress");
+    try {
+      const response = await axios.put(`${serverURL}${taskId}`,task, {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+      })
+      if (response.status === 200) { 
+        console.log("Task Update")
+        setUpdateTaskForm(false)
+      } else {
+        console.log('Update error:', response.data);
+      }
+    } catch (error) {
+      console.log('Error:', error);
+    }
+  }
   const deleteTask = async (taskId) => {
     const deleteConfirm = confirm("Are you sure you want to delete this task?")
     if(deleteConfirm){
@@ -124,7 +169,7 @@ function App() {
       <Header/>
       <div className="container">
           <input type="date" onChange={handleDateChange}/>
-          
+          {updateTaskForm ? updateForm() : (<></>)}
           {addTask ? (
             <form className="addTask-form" onSubmit={registerTask}>
               <h2>Fill the task fields</h2>
@@ -148,9 +193,9 @@ function App() {
               {
                 tasks.map((task,index)=> (
                 <div className='task-content'>
-                  <TaskCard title={task.title} status={task.status} deadline={task.deadline.slice(-5)}/>
+                  <TaskCard title={task.title} status={task.status} deadline={task.deadline.slice(11,16)}/>
                   <button onClick={()=>setTaskStatus("Completed")}>Finish</button>
-                  <button id='update-task-bt'><img src="../public/edit-icon.svg"/></button>
+                  <button id='update-task-bt' onClick={()=>{setUpdateTaskForm(true);setUpdateId(task.task_id);setTaskTitle(task.title);setTaskTime(task.deadline.slice(11,16))}}><img src="../public/edit-icon.svg"/></button>
                   <button id='delete-task-bt' onClick={()=>{deleteTask(task.task_id); setTaskDeleted(true)}}><img src="../public/trash-icon.png"/></button>
                 </div>  
                 ))

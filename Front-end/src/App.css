@@ -31,12 +31,38 @@
   flex-direction: column;
   align-items: center;
 }
-.addTask-form h2{
+.updateTask{
+  height: 50vh;
+  width: 90%;
+  margin-top: 5%;
+  border-radius: 20px;
+  background-color: rgba(22, 21, 21, 0.904);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  z-index: 2;
+}
+.updateTask-form{
+  height: auto;
+  width: 50%;
+  padding: 2vh;
+  border-radius: 25px;
+  background-color: rgb(52, 57, 61);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.updateTask-form label,.updateTask-form h2{
+  color: white;
+}
+.addTask-form h2,.updateTask-form h2{
   height: auto;
   width: auto;
   font-size: 4vh;
 }
-#new-task,.addTask-form input[type="submit"]{
+#new-task,.addTask-form input[type="submit"],.updateTask-form input[type="submit"]{
   height: auto;
   width: auto;
   font-size: 3vh;
@@ -47,17 +73,20 @@
   color: white;
   cursor: pointer;
 }
-.addTask-form input[type="submit"]:hover{
+.addTask-form input[type="submit"],.updateTask-form input[type="submit"]{
+  background-color: rgb(2, 167, 2);
+}
+.addTask-form input[type="submit"]:hover,.updateTask-form input[type="submit"]:hover{
   background-color: white;
   color: rgb(0, 127, 247);
   transition: 0.3s;
 }
-.addTask-form input[type="submit"]:active{
+.addTask-form input[type="submit"]:active,.updateTask-form input[type="submit"]:active{
   background-color: black;
   color: white;
   transition: 0.1s;
 }
-.addTask-form input[type="button"]{
+.addTask-form input[type="button"],.updateTask-form input[type="button"]{
   height: auto;
   width: auto;
   font-size: 3vh;
@@ -68,12 +97,12 @@
   color: white;
   cursor: pointer;
 }
-.addTask-form input[type="button"]:hover{
+.addTask-form input[type="button"]:hover,.updateTask-form input[type="button"]:hover{
   background-color: white;
   color: red;
   transition: 0.3s;
 }
-.addTask-form input[type="button"]:active{
+.addTask-form input[type="button"]:active,.updateTask-form input[type="button"]:active{
   background-color: black;
   color: white;
   transition: 0.1s;
