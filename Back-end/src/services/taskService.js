@@ -39,12 +39,16 @@ const getAllTasks = async (date) => {
 }
 
 const updateTask = async (task_id,newData) => {
+    const deadlineMoment = moment(newData.deadline, 'YYYY-MM-DD HH:mm:ss');
+    newData.deadline = deadlineMoment.subtract(3, 'hours').toISOString();
+
     const task = await prisma.task.update({
         where: { task_id: parseInt(task_id) },
         data: newData
     })
     console.log('Task Updated:', task);
 }
+
 const updateTaskStatus = async (task_id,status) => {
     const task = await prisma.task.update({
         where: { task_id: parseInt(task_id) },
