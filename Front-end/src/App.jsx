@@ -2,6 +2,7 @@ import { useState,useEffect } from 'react'
 import Header from './components/Header/Header'
 import TaskCard from './components/Task Card/TaskCard';
 import axios from 'axios';
+import moment from 'moment-timezone';
 import config from './serverURL';
 import './App.css'
 const serverURL = config.serverAdress
@@ -15,22 +16,47 @@ function App() {
   const [updateTaskForm, setUpdateTaskForm] = useState(false);
   const [updateId, setUpdateId] = useState();
   const [completed,setCompleted] = useState(false)
-  const [uncompleted,setUncompleted] = useState(false)
+  const [incomplete,setIncomplete] = useState(false)
   const [addTask,setAddTask] = useState(false)
   const [addButton,setAddButton] = useState(false)
   const [task,setTask] = useState()
   const [tasks,setTasks] = useState([])
   const [currentTime,setCurrentTime]=useState('')
 
-  //useEffect to get current time
-  // useEffect(()=>{
-  //   const intervalId = setInterval(() => {
-  //     setCurrentTime(getCurrentDateTime());
-  //     console.log(currentTime)
-  //   }, 1000);
-    
-  //   return () => clearInterval(intervalId);
-  // },[currentTime])
+  //useEffect to get current time and update tasks to unfinished if not completed
+  useEffect(()=>{
+    const intervalId = setInterval(async () => {
+      const currentTime = moment().tz('UTC');
+      await Promise.all(tasks.map(async (task) => {
+        const deadline = moment(task.deadline).tz('UTC').add(3,'hours');
+        if ((deadline.toDate()<currentTime.toDate()) && task.status !== "Completed" && task.status !== "Incomplete") {
+          try {
+            const response = await axios.put(
+              `${serverURL}${task.task_id}/status/Incomplete`,
+              {},
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                }
+              }
+            );
+            if (response.status === 200) {
+              console.log("Task Incomplete");
+              console.log(deadline)
+              console.log(deadline.toDate())
+              setIncomplete(true)
+            } else {
+              console.log('Update error:', response.data);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      }));
+      console.log(currentTime.toDate());
+    }, 1000);
+    return () => clearInterval(intervalId);
+  },[tasks])
 
   //useEffect to set new task
   useEffect(()=>{
@@ -55,7 +81,8 @@ function App() {
     getData()
     setTaskDeleted(false)
     setCompleted(false)
-  },[taskDate,task,taskDeleted,updateTaskForm,completed])
+    setIncomplete(false)
+  },[taskDate,task,taskDeleted,updateTaskForm,completed,incomplete])
   
   //useEffect to update tasks to unfinished if not completed
   // useEffect(()=>{
@@ -206,24 +233,6 @@ function App() {
       console.log('Error:', error);
     }
   }
-  // const updateTaskStatus = async (e,taskId) =>{
-  //   e.preventDefault()
-  //   try {
-  //     const response = await axios.put(`${serverURL}${taskId}`,task, {
-  //       headers: {
-  //           'Content-Type': 'application/json',
-  //       }
-  //     })
-  //     if (response.status === 200) { 
-  //       console.log("Task Update")
-  //       setUpdateTaskForm(false)
-  //     } else {
-  //       console.log('Update error:', response.data);
-  //     }
-  //   } catch (error) {
-  //     console.log('Error:', error);
-  //   }
-  // }
 
   const deleteTask = async (taskId) => {
     const deleteConfirm = confirm("Are you sure you want to delete this task?")
@@ -269,7 +278,7 @@ function App() {
           {tasks.length>0 ? (
             <div className='tasks-container'>
               {
-                tasks.map((task,index)=> (
+                tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline)).map((task,index)=> (
                 <div className='task-content'>
                   <TaskCard title={task.title} status={task.status} deadline={task.deadline.slice(11,16)}/>
                   { task.status=="In Progress" ? (
