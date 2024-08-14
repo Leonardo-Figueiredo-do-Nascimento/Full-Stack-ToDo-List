@@ -19,6 +19,7 @@ function App() {
   const [incomplete,setIncomplete] = useState(false)
   const [addTask,setAddTask] = useState(false)
   const [addButton,setAddButton] = useState(false)
+  const [pastDate, setPastDate] = useState('');
   const [task,setTask] = useState()
   const [tasks,setTasks] = useState([])
 
@@ -100,7 +101,7 @@ function App() {
     const currentDate = getCurrentDate();
 
     if (selectedDate < currentDate) {
-      setTaskDate(''); 
+      setTaskDate(selectedDate);
       setAddTask(false)
       setAddButton(false)
     } else {
@@ -199,7 +200,6 @@ function App() {
       console.log('Error:', error);
     }
   }
-
   const deleteTask = async (taskId) => {
     const deleteConfirm = confirm("Are you sure you want to delete this task?")
     if(deleteConfirm){
